@@ -17,6 +17,7 @@ const observer = new MutationObserver(() => {
 
   if (toolbar && !fillBtnRendered) {
     const cont = document.createElement('div')
+    cont.className = 'tailwind'
     toolbar.appendChild(cont)
     render(<FillButton/>, cont)
     fillBtnRendered = true

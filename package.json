@@ -1,16 +1,19 @@
 {
   "name": "timesheeteer",
   "version": "0.0.1",
-"scripts": {
+  "scripts": {
     "build": "node utils/build.js",
     "start": "node utils/webserver.js",
     "prettier": "prettier --write '**/*.{js,jsx,ts,tsx,json,css,scss,md}'"
   },
   "dependencies": {
     "@hot-loader/react-dom": "^17.0.2",
+    "dayjs": "^1.11.8",
     "react": "^17.0.2",
+    "react-calendar": "^4.2.1",
     "react-dom": "^17.0.2",
-    "react-hot-loader": "^4.13.0"
+    "react-hot-loader": "^4.13.0",
+    "react-icons": "^4.9.0"
   },
   "devDependencies": {
     "@babel/core": "^7.17.0",
@@ -41,6 +44,7 @@
     "node-sass": "^6.0.1",
     "postcss": "^8.4.6",
     "postcss-loader": "^6.2.1",
+    "postcss-nested": "^6.0.1",
     "prettier": "^2.5.1",
     "sass-loader": "^12.4.0",
     "source-map-loader": "^3.0.1",

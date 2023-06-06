@@ -1,0 +1,7 @@
+.tailwind {
+  @apply text-stone-700 bg-stone-50 w-[350px] h-[576px] inline-block
+}
+
+body:has(> .tailwind) {
+  @apply m-0
+}
