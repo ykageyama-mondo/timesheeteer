@@ -1,6 +1,6 @@
 import { render } from 'react-dom';
 
-import Popup from './Popup';
+import Popup from './Components/Popup';
 import '../../assets/styles/tailwind.css';
 import './index.css'
 

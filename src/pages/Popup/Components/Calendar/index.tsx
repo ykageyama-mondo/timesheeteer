@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import ReactCalendar from 'react-calendar';
 import { TileArgs } from 'react-calendar/dist/cjs/shared/types';
-import './Calendar.css';
+import './index.css';
 import { MdChevronLeft, MdChevronRight } from 'react-icons/md';
 import {dateExists, datesExcept} from '@/helpers/date'
 

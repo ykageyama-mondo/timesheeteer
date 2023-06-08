@@ -237,7 +237,6 @@ const fillWorkType = async (sections: Sections, workType: string) => {
   await retryUntilTrue(100, async () => {
     try {
       const el = await getElement(sapQueries.dialog, { maxRetries: 1 });
-      logger.log(el.checkVisibility());
       // eslint-disable-next-line eqeqeq
       return el == undefined;
     } catch (error) {
