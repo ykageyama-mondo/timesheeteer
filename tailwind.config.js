@@ -8,7 +8,9 @@ module.exports = {
       }
     },
   },
-  plugins: [],
+  plugins: [
+    require('tailwind-scrollbar', {nocompatible: true }),
+  ],
   variants: {},
   corePlugins: {
     preflight: true,

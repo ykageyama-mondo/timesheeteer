@@ -1,11 +1,11 @@
 import { useState } from 'react';
 import { logger } from '@/helpers/logger';
-import { FiCalendar, FiPlus, FiSettings, FiSliders } from 'react-icons/fi';
+import { FiCalendar } from 'react-icons/fi';
 import { CalendarModal } from './Calendar';
 import { dateExists } from '@/helpers/date';
 import dayjs from 'dayjs';
 import {LoadingOverlay} from './LoadingOverlay'
-import {Record} from './Record'
+import {RecordList} from './Record'
 import {Footer} from './Footer'
 const today = new Date();
 
@@ -63,16 +63,16 @@ const Popup = () => {
         setShow={setShowCalendar}
         onSubmit={(dates) => handleCalendarSubmit(dates)}
       />
-      <div className="m-4">
-        <div className="flex gap-2 items-bottom">
+      <div>
+        <div className="flex gap-2 items-bottom mx-4 mt-4">
           <p className="text-2xl font-bold pl-5 text-rose-400">
             {getHeaderText()}
           </p>
-          <button className="text-xl" onClick={() => setShowCalendar(true)}>
+          <button tabIndex={-1} className="text-xl" onClick={() => setShowCalendar(true)}>
             <FiCalendar />
           </button>
         </div>
-        <Record/>
+        <RecordList/>
       </div>
       <Footer handleFill={onFill}/>
     </div>
