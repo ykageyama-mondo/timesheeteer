@@ -89,8 +89,8 @@ var options = {
         exclude: /node_modules/,
         resolve: {
           alias: {
-              "@": path.resolve(__dirname, "./src")
-          }
+            '@': path.resolve(__dirname, './src'),
+          },
         },
       },
       {

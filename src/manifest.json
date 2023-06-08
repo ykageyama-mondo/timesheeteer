@@ -2,7 +2,8 @@
   "manifest_version": 3,
   "name": "TimeSheeteer",
   "description": "Less Shitty TimeSheeting",
-  "background": { "service_worker": "background.bundle.js" },
+  "background": { "service_worker": "background.bundle.js", "type": "module" },
+  "minimum_chrome_version": "100",
   "action": {
     "default_popup": "popup.html",
     "default_icon": "icon-34.png"
@@ -17,6 +18,7 @@
       "css": ["content.styles.css"]
     }
   ],
+  "host_permissions": ["https://performancemanager10.successfactors.com/sf/timesheet*"],
   "devtools_page": "devtools.html",
   "web_accessible_resources": [
     {
@@ -25,6 +27,8 @@
     }
   ],
   "permissions": [
-    "storage"
+    "storage",
+    "scripting",
+    "tabs"
   ]
 }
