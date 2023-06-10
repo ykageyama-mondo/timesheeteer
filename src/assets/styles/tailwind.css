@@ -2,4 +2,8 @@
   @tailwind base;
   @tailwind components;
   @tailwind utilities;
+
+  input {
+    @apply placeholder-stone-400
+  }
 }

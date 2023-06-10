@@ -7,6 +7,7 @@ import dayjs from 'dayjs';
 import {LoadingOverlay} from './LoadingOverlay'
 import {RecordList} from './Record'
 import {Footer} from './Footer'
+import {Toaster} from 'react-hot-toast'
 const today = new Date();
 
 
@@ -63,6 +64,7 @@ const Popup = () => {
         setShow={setShowCalendar}
         onSubmit={(dates) => handleCalendarSubmit(dates)}
       />
+      <Toaster position='bottom-center' toastOptions={{duration: 2000, }}/>
       <div>
         <div className="flex gap-2 items-bottom mx-4 mt-4">
           <p className="text-2xl font-bold pl-5 text-rose-400">

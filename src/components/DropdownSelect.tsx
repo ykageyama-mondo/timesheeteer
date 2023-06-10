@@ -1,17 +1,28 @@
-import {useState, useRef, ChangeEvent, KeyboardEvent, ReactElement} from 'react'
-import {FaChevronCircleDown, FaChevronRight} from 'react-icons/fa'
+import {
+  useState,
+  useRef,
+  ChangeEvent,
+  KeyboardEvent,
+  ReactElement,
+} from 'react';
+import { FaChevronCircleDown, FaChevronRight } from 'react-icons/fa';
 
 export interface DropdownItem<T> {
-  label: string,
-  value: T
+  label: string;
+  value: T;
 }
 
 interface DropdownSelectProps<T> {
   options: DropdownItem<T>[];
   onSelect: (item: T) => void;
+  placeHolder?: string;
 }
 
-export const DropdownSelect = <T,>({options, onSelect}: DropdownSelectProps<T>): ReactElement => {
+export const DropdownSelect = <T,>({
+  options,
+  onSelect,
+  placeHolder,
+}: DropdownSelectProps<T>): ReactElement => {
   const [show, setShow] = useState(false);
   const option = useRef<DropdownItem<T> | null>(null);
   const [types, setTypes] = useState(options);
@@ -23,7 +34,7 @@ export const DropdownSelect = <T,>({options, onSelect}: DropdownSelectProps<T>):
 
     const filtered = options.filter((type) => type.label.includes(value));
     setTypes(filtered);
-    setTargetIndex(0)
+    setTargetIndex(0);
   };
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -34,7 +45,7 @@ export const DropdownSelect = <T,>({options, onSelect}: DropdownSelectProps<T>):
   };
 
   const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
-    switch(e.key) {
+    switch (e.key) {
       case 'ArrowDown':
         setTargetIndex((prev) => {
           const next = prev + 1;
@@ -53,14 +64,14 @@ export const DropdownSelect = <T,>({options, onSelect}: DropdownSelectProps<T>):
         handleSelect(options[targetIndex]);
         break;
     }
-  }
+  };
 
   const handleSelect = (t: typeof options[number]) => {
     option.current = t;
-    onSelect(t.value)
-    setSearch(t.label)
+    onSelect(t.value);
+    setSearch(t.label);
     setShow(false);
-  }
+  };
 
   return (
     <div>
@@ -71,8 +82,9 @@ export const DropdownSelect = <T,>({options, onSelect}: DropdownSelectProps<T>):
           onFocus={() => setShow(true)}
           onBlur={() => setShow(false)}
           onChange={handleChange}
-          className="w-[6rem] focus:outline-none bg-transparent"
+          className="w-[8rem] focus:outline-none bg-transparent placeholder-stone-400"
           value={search}
+          placeholder={placeHolder}
         />
         {show ? (
           <FaChevronCircleDown className="text-stone-600 text-xs" />
@@ -88,16 +100,19 @@ export const DropdownSelect = <T,>({options, onSelect}: DropdownSelectProps<T>):
         <ul className="select-none py-2 text-sm text-stone-700">
           {types.map((type, i) => (
             <li key={type.label}>
-            <button
-              onMouseDown={(e) => {
-                handleSelect(type)
-              }}
-              type="button"
-              className={"inline-flex w-full px-4 py-2 text-sm text-stone-700 hover:bg-rose-200 " + (i === targetIndex ? 'bg-rose-100': '')}
-            >
-              {type.label}
-            </button>
-          </li>
+              <button
+                onMouseDown={() => {
+                  handleSelect(type);
+                }}
+                type="button"
+                className={
+                  'inline-flex w-full px-4 py-2 text-sm text-stone-700 hover:bg-rose-200 ' +
+                  (i === targetIndex ? 'bg-rose-100' : '')
+                }
+              >
+                {type.label}
+              </button>
+            </li>
           ))}
         </ul>
       </div>

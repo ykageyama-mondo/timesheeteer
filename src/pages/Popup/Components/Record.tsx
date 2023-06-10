@@ -1,8 +1,8 @@
-import {DropdownItem, DropdownSelect} from '@/components/DropdownSelect'
+import {DropdownSelect} from '@/components/DropdownSelect'
 import {logger} from '@/helpers/logger'
-import {TimeRecord} from '@/models/timeRecord'
-import { ChangeEvent, createRef, useRef, useState, KeyboardEvent, forwardRef } from 'react';
-import { FaChevronCircleDown, FaChevronRight, FaPlus } from 'react-icons/fa';
+import { ChangeEvent, useRef, useState, forwardRef } from 'react';
+import {toast} from 'react-hot-toast'
+import { FaPlus } from 'react-icons/fa';
 
 
 interface Time {
@@ -120,17 +120,17 @@ const Record = () => {
 
 
   return (
-    <div className="font-bold flex flex-col gap-2">
+    <div className="text-lg font-bold flex flex-col gap-2">
       <div className="gap-2 flex justify-start items-center ">
-        I <DropdownSelect onSelect={handleTimeTypeSelect} options={timeTypes}/>
+        I <DropdownSelect onSelect={handleTimeTypeSelect} options={timeTypes} placeHolder='worked'/>
       </div>
 
-      <div className="flex justify-start items-center  gap-1">
+      <div className="flex justify-start items-center  gap-2">
         From <TimePicker nextRef={toRef}/>
         To <TimePicker ref={toRef}/>
       </div>
       {timeType === 'Normal Time' && <div className="flex justify-start items-center  gap-2">
-        Doing <DropdownSelect onSelect={handleWorkTypeSelect} options={workTypes}/> work
+        Doing <DropdownSelect onSelect={handleWorkTypeSelect} options={workTypes} placeHolder='CAPEX'/> work
       </div>}
     </div>
   );
@@ -140,6 +140,7 @@ export const RecordList = () => {
   const [records, setRecords] = useState<RecordItem[]>([])
 
   const handleAddRecord = () => {
+    toast('hello')
     const prev = records[records.length - 1]
     setRecords([...records, {
       from: {
@@ -160,7 +161,7 @@ export const RecordList = () => {
         </div>
       ))}
 
-      <button onClick={handleAddRecord} className="z-10 group gap-2 w-full flex justify-center items-center bg-rose-200 hover:bg-rose-300 transition-all duration-300 hover:ring ring-rose-200 hover:font-bold p-4 rounded-full mt-2 text-base">
+      <button onClick={handleAddRecord} className="group gap-2 w-full flex justify-center items-center bg-rose-200 hover:bg-rose-300 transition-all duration-300 hover:ring ring-rose-200 hover:font-bold p-4 rounded-full mt-2 text-base">
         <FaPlus className=" w-5 h-5 text-rose-500 group-hover:text-rose-700 transition-colors duration-300" />
         <span>Record Time</span>
       </button>
