@@ -1,4 +1,4 @@
-import {FormEvent, useEffect, useState} from 'react'
+import {useEffect, useState} from 'react'
 import {logger} from '@/helpers/logger'
 import {FiCalendar} from 'react-icons/fi'
 import {CalendarModal} from './Calendar'
@@ -8,36 +8,11 @@ import {LoadingOverlay} from './LoadingOverlay'
 import {RecordList} from './Record'
 import {Footer} from './Footer'
 import toast, {Toaster} from 'react-hot-toast'
-import {useAtomValue} from 'jotai'
-import {recordsAtom} from '../Atoms'
 import {RecordItem, ValidatedRecordItem} from '../Models'
 import {TimeRecord, WorkType} from '@/models/timeRecord'
-import {Control, FieldErrors, FormProvider, useFieldArray, useForm, useFormContext} from 'react-hook-form'
+import {FieldErrors, FormProvider, useForm} from 'react-hook-form'
+import {timeTypes, workTypes} from '../config'
 const today = new Date()
-
-const validateRecordsAndAlert = (records: RecordItem[]): records is ValidatedRecordItem[] => {
-  if (records.length === 0) {
-    toast.error('Add at least one record')
-    return false
-  }
-  for (const record of records) {
-    if (
-      record.from.hour === undefined ||
-      record.from.min === undefined||
-      record.to.hour === undefined||
-      record.to.min === undefined ||
-      record.timeType === undefined
-    ) {
-      toast.error('You gotta fill in all the fields')
-      return false
-    }
-    if (record.timeType !== 'Break' && record.workType === undefined) {
-      toast.error('You gotta select a work type')
-      return false
-    }
-  }
-  return true
-}
 
 const defaultWorkTypeMap: Record<string, WorkType> = {
   OPEX: {
@@ -55,22 +30,31 @@ const transformRecords = (records: ValidatedRecordItem[]): TimeRecord[] => {
     const startTime = `${from.hour}:${from.min}`
     const endTime = `${to.hour}:${to.min}`
 
-    const mappedWorkType = timeType === 'Break' ? {workType: 'None'} : defaultWorkTypeMap[workType]
+    const timeTypeValue = (timeTypes as Record<string, string>)[timeType]
+    const workTypeValue = (workTypes as Record<string, string>)[workType]
+
+    const mappedWorkType = timeTypeValue === 'Break' ? {workType: 'None'} : defaultWorkTypeMap[workTypeValue]
     return {
       startTime,
       endTime,
-      timeType,
+      timeType: timeTypeValue,
       ...mappedWorkType
     } as TimeRecord
   })
 }
 interface FormData {records: RecordItem[]}
 
+const pageHeaderMap: Record<string, string> = {
+  'presets': 'Presets',
+  'settings': 'Settings'
+}
+
 const Popup = () => {
   const [dates, setDates] = useState<Date[]>([today])
   const [showCalendar, setShowCalendar] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
 
+  const [currentPage, setCurrentPage] = useState('home')
   const methods = useForm<FormData>({
     defaultValues: localStorage.getItem('formData') ? JSON.parse(localStorage.getItem('formData')!) : {records: []},
     resetOptions: {
@@ -81,6 +65,7 @@ const Popup = () => {
   // cache records in local storage
   useEffect(() => {
     const sub = watch((value) => {
+      logger.log(value)
       localStorage.setItem('formData', JSON.stringify(value))
     })
     return () => {
@@ -93,6 +78,9 @@ const Popup = () => {
     setDates(d)
   }
   const getHeaderText = () => {
+    if (currentPage !== 'home')
+      return pageHeaderMap[currentPage] ?? 'Narnia'
+
     if (dates.length === 0) return 'No days selected'
 
     const parts = []
@@ -118,10 +106,8 @@ const Popup = () => {
   }
 
   const onFill = (formData: FormData) => {
-    if (!validateRecordsAndAlert(formData.records)) return
-
     setIsLoading(true)
-    const payload = transformRecords(formData.records)
+    const payload = transformRecords(formData.records as ValidatedRecordItem[])
     logger.log('Sending fill command to background service.', payload)
 
     chrome.runtime.sendMessage({action: 'fill', data: {records: payload}}, async (response) => {
@@ -143,7 +129,8 @@ const Popup = () => {
     }
 
     if (e.records && e.records.length) {
-      toast.error(e.records[0]!.message ?? `There was an error with your records. You probably missed a field or something.`)
+      const [first] = [e.records]
+      toast.error(first.message ?? `There was an error with your records. You probably missed a field or something.`)
       return
     }
   }
@@ -173,13 +160,13 @@ const Popup = () => {
             <p className=" text-2xl font-bold text-rose-400">
               {getHeaderText()}
             </p>
-            <button type='button' tabIndex={-1} className="text-xl rounded-full hover:bg-zinc-300 h-8 w-8 text-align-center grid place-content-center transition-all duration-300" onClick={() => setShowCalendar(true)}>
+            <button type='button' tabIndex={-1} className="text-xl rounded-full hover:bg-stone-300 h-8 w-8 text-align-center grid place-content-center transition-all duration-300" onClick={() => setShowCalendar(true)}>
               <FiCalendar/>
             </button>
             <button type='button' tabIndex={-1} className='font-bold text-rose-300 hover:text-rose-400 hover:underline transition-all duration-100 text-sm ml-auto mt-auto' onClick={() => reset({records: []}, {keepDefaultValues: false,})}>clear</button>
           </div>
           <RecordList />
-          <Footer/>
+          <Footer setPage={setCurrentPage} page={currentPage}/>
         </form>
       </FormProvider>
     </div>

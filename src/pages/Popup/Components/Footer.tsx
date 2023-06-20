@@ -1,4 +1,4 @@
-import { FiPlus, FiSettings, FiSliders } from 'react-icons/fi';
+import { FiSettings, FiSliders } from 'react-icons/fi';
 import { FaFillDrip } from 'react-icons/fa';
 const ToolbarButton = ({
   icon,
@@ -19,13 +19,21 @@ const ToolbarButton = ({
   );
 };
 
-export const Footer: React.FC = () => {
+interface FooterProps {
+  page: string,
+  setPage: (newPage: string) => void
+}
+
+export const Footer: React.FC<FooterProps> = ({
+  page,
+  setPage
+}) => {
   return (
     <div className="flex items-center justify-center gap-6 absolute bottom-0 bg-rose-400 w-full h-12">
       <ToolbarButton
         icon={<FiSliders className="text-2xl" />}
         label="Presets"
-        onClick={() => {}}
+        onClick={() => setPage('presets')}
       />
       <button
         type="submit"
@@ -40,7 +48,7 @@ export const Footer: React.FC = () => {
       <ToolbarButton
         icon={<FiSettings className="text-2xl" />}
         label="Settings"
-        onClick={() => {}}
+        onClick={() => setPage('settings')}
       />
     </div>
   );

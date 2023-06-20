@@ -1,28 +1,21 @@
 import {DropdownSelect} from '@/components/DropdownSelect'
-import {ChangeEvent, useRef, useState} from 'react'
+import {ChangeEvent, useEffect} from 'react'
 import {FaPlus, FaTrash} from 'react-icons/fa'
 import {useFieldArray, useFormContext} from 'react-hook-form'
-
-
-interface Time {
-  hour: string
-  min: string
-}
+import {expandTimeTypes, timeOptions, workOptions} from '../config'
 
 interface TimePickerProps {
   name: string;
 }
 
 const TimePicker: React.FC<TimePickerProps> = ({name}) => {
-  const [time, setTime] = useState<Time>({hour: '', min: ''})
-  const {register, setFocus} = useFormContext()
+  const {register, setFocus, setValue} = useFormContext()
 
   const onHourChange = (e: ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value
 
     if (value.length > 2) return
     if (value.length === 0) {
-      setTime({...time, hour: ''})
       return
     }
 
@@ -30,7 +23,8 @@ const TimePicker: React.FC<TimePickerProps> = ({name}) => {
     if (isNaN(parsed)) return
     const clamped = '' + Math.min(Math.max(parsed, 0), 23)
     const hour = clamped.padStart(value.length, '0')
-    setTime({...time, hour})
+    setValue(`${name}.hour`, hour)
+
     if (hour.length === 2) {
       setFocus(`${name}.min`)
     }
@@ -40,7 +34,6 @@ const TimePicker: React.FC<TimePickerProps> = ({name}) => {
     const value = e.target.value
     if (value.length > 2) return
     if (value.length === 0) {
-      setTime({...time, min: ''})
       return
     }
 
@@ -48,8 +41,7 @@ const TimePicker: React.FC<TimePickerProps> = ({name}) => {
     if (isNaN(parsed)) return
     const clamped = '' + Math.min(Math.max(parsed, 0), 59)
     const min = clamped.padStart(value.length, '0')
-
-    setTime({...time, min})
+    setValue(`${name}.min`, min)
     // if (min.length === 2) {
     //   logger.log(nextRef)
     //   nextRef?.current?.focus()
@@ -74,7 +66,6 @@ const TimePicker: React.FC<TimePickerProps> = ({name}) => {
         maxLength={2}
         tabIndex={2}
         type="text"
-        value={time.hour}
         className="w-12 overflow-hidden text-center bg-transparent focus:outline-none"
         {...hourRest}
       />
@@ -86,7 +77,6 @@ const TimePicker: React.FC<TimePickerProps> = ({name}) => {
         maxLength={2}
         tabIndex={2}
         type="text"
-        value={time.min}
         className="w-12 overflow-hidden text-center bg-transparent focus:outline-none"
         {...minRest}
       />
@@ -94,38 +84,25 @@ const TimePicker: React.FC<TimePickerProps> = ({name}) => {
   )
 }
 
-const timeTypes = [
-  {
-    label: 'worked',
-    value: 'Normal Time',
-  },
-  {
-    label: 'took a break',
-    value: 'Break',
-  },
-]
-
-const workTypes = [
-  {
-    label: 'CAPEX',
-    value: 'CAPEX'
-  },
-  {
-    label: 'OPEX',
-    value: 'OPEX'
-  },
-]
 
 const Record = ({onRemove, index}: {
   onRemove: () => void,
   index: number,
 }) => {
-  const {getValues} = useFormContext()
+  const {watch, unregister} = useFormContext()
+
+  const timeType = watch(`records.${index}.timeType` as const)
+
+  useEffect(() => {
+    if (!expandTimeTypes.includes(timeType)) {
+      unregister(`records.${index}.workType` as const)
+    }
+  } , [timeType, index, unregister])
 
   return (
     <div className="flex flex-col gap-2 text-lg font-bold">
       <div className="flex items-center gap-2">
-        I <DropdownSelect options={timeTypes} placeHolder='worked' name={`records.${index}.timeType` as const}/>
+        I <DropdownSelect options={timeOptions} placeHolder='worked' name={`records.${index}.timeType` as const}/>
         <button tabIndex={-1} type='button' className="transition-all group ml-auto p-2 rounded-full hover:bg-stone-200" onClick={onRemove}>
           <FaTrash className="w-4 h-4 text-rose-400 hover group-hover:text-rose-500 transition-all " />
         </button>
@@ -136,8 +113,8 @@ const Record = ({onRemove, index}: {
         To <TimePicker name={`records.${index}.to`}/>
       </div>
       {
-        getValues(`records.${index}.timeType`) === 'Normal Time' && <div className="flex items-center justify-start gap-2">
-          Doing <DropdownSelect options={workTypes} placeHolder='CAPEX' name={`records.${index}.workType` as const}/> work
+        expandTimeTypes.includes(timeType) && <div key={`workType${index}` }className="flex items-center justify-start gap-2">
+          Doing <DropdownSelect options={workOptions} placeHolder='CAPEX' name={`records.${index}.workType` as const}/> work
         </div>
       }
     </div >
