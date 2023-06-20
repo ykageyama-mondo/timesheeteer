@@ -10,6 +10,9 @@ dependencies:
   dayjs:
     specifier: ^1.11.8
     version: 1.11.8
+  jotai:
+    specifier: ^2.2.1
+    version: 2.2.1(react@17.0.2)
   react:
     specifier: ^17.0.2
     version: 17.0.2
@@ -19,6 +22,9 @@ dependencies:
   react-dom:
     specifier: ^17.0.2
     version: 17.0.2(react@17.0.2)
+  react-hook-form:
+    specifier: ^7.45.0
+    version: 7.45.0(react@17.0.2)
   react-hot-loader:
     specifier: ^4.13.0
     version: 4.13.0(@types/react@17.0.39)(react-dom@17.0.2)(react@17.0.2)
@@ -4820,6 +4826,18 @@ packages:
       supports-color: 8.1.1
     dev: true
 
+  /jotai@2.2.1(react@17.0.2):
+    resolution: {integrity: sha512-Gz4tpbRQy9OiFgBwF9F7TieDn0UTE3C0IFSDuxHjOIvgn2tACH30UKz6p/wIlfoZROXSTCIxEvYEa7Y25WM+8g==}
+    engines: {node: '>=12.20.0'}
+    peerDependencies:
+      react: '>=17.0.0'
+    peerDependenciesMeta:
+      react:
+        optional: true
+    dependencies:
+      react: 17.0.2
+    dev: false
+
   /js-base64@2.6.4:
     resolution: {integrity: sha512-pZe//GGmwJndub7ZghVHz7vjb2LgC1m8B07Au3eYqeqv9emhESByMXxaEgkUkEqJe87oBbSniGYoQNIBklc7IQ==}
     dev: true
@@ -5897,6 +5915,15 @@ packages:
       object-assign: 4.1.1
       react: 17.0.2
       scheduler: 0.20.2
+    dev: false
+
+  /react-hook-form@7.45.0(react@17.0.2):
+    resolution: {integrity: sha512-AbHeZ4ad+0dEIknSW9dBgIwcvRDfZ1O97sgj75WaMdOX0eg8TBiUf9wxzVkIjZbk76BBIE9lmFOzyD4PN80ZQg==}
+    engines: {node: '>=12.22.0'}
+    peerDependencies:
+      react: ^16.8.0 || ^17 || ^18
+    dependencies:
+      react: 17.0.2
     dev: false
 
   /react-hot-loader@4.13.0(@types/react@17.0.39)(react-dom@17.0.2)(react@17.0.2):

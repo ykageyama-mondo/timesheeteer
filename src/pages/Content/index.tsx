@@ -27,10 +27,10 @@ window.addEventListener('load', () => {
 
 chrome.runtime.onMessage.addListener(async (request, sender, sendResponse) => {
   logger.log('Received Fill Message. Executing fill')
-
+  logger.log(request)
   if (request.action === 'executeFill') {
     logger.log('Received Fill Message. Executing fill')
-    await executeFill()
+    await executeFill(request.data)
   }
   sendResponse({success: true})
   return

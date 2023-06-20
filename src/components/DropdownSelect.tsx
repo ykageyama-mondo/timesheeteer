@@ -1,3 +1,4 @@
+import {logger} from '@/helpers/logger'
 import {
   useState,
   useRef,
@@ -5,6 +6,7 @@ import {
   KeyboardEvent,
   ReactElement,
 } from 'react';
+import {useFormContext} from 'react-hook-form'
 import { FaChevronCircleDown, FaChevronRight } from 'react-icons/fa';
 
 export interface DropdownItem<T> {
@@ -14,34 +16,39 @@ export interface DropdownItem<T> {
 
 interface DropdownSelectProps<T> {
   options: DropdownItem<T>[];
-  onSelect: (item: T) => void;
   placeHolder?: string;
+  name: string;
 }
 
 export const DropdownSelect = <T,>({
   options,
-  onSelect,
   placeHolder,
+  name,
 }: DropdownSelectProps<T>): ReactElement => {
+  const {register, setValue, getValues} = useFormContext()
+
   const [show, setShow] = useState(false);
   const option = useRef<DropdownItem<T> | null>(null);
   const [types, setTypes] = useState(options);
-  const [search, setSearch] = useState('');
+  const [search, setSearch] = useState(options.find(v => v.value === getValues(name))?.label ?? '');
   const [targetIndex, setTargetIndex] = useState<number>(0);
+
+
+  const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+
+    filterOptions(value);
+    setSearch(value);
+    setShow(true);
+  };
 
   const filterOptions = (value: string) => {
     if (option.current?.label === value) return;
 
-    const filtered = options.filter((type) => type.label.includes(value));
+    // TODO: Cache lower options
+    const filtered = options.filter((type) => type.label.toLowerCase().includes(value.toLowerCase()));
     setTypes(filtered);
     setTargetIndex(0);
-  };
-
-  const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
-    filterOptions(value);
-    setSearch(value);
-    setShow(true);
   };
 
   const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
@@ -68,28 +75,31 @@ export const DropdownSelect = <T,>({
 
   const handleSelect = (t: typeof options[number]) => {
     option.current = t;
-    onSelect(t.value);
+    setValue(name, t.value)
     setSearch(t.label);
     setShow(false);
   };
 
+  const {onChange, onBlur, ref, ...rest} = register(name, {required: true, onBlur: () => setShow(false)})
+
   return (
     <div>
-      <div className=" h-9 font-medium text-center bg-stone-50 border border-stone-200 rounded-full hover:border-rose-300 focus:ring-1 focus:ring-rose-300 px-4 flex items-center gap-3">
+      <div className="h-9 font-medium text-center bg-stone-50 border border-stone-200 rounded-full hover:border-rose-300 focus:ring-1 focus:ring-rose-300 px-4 flex items-center gap-3">
         <input
+          autoComplete='off'
           tabIndex={2}
           onKeyDown={handleKeyDown}
           onFocus={() => setShow(true)}
-          onBlur={() => setShow(false)}
-          onChange={handleChange}
           className="w-[8rem] focus:outline-none bg-transparent placeholder-stone-400"
           value={search}
           placeholder={placeHolder}
+          onChange={handleChange}
+          {...rest}
         />
         {show ? (
-          <FaChevronCircleDown className="text-stone-600 text-xs" />
+          <FaChevronCircleDown className="text-stone-600 text-xs cursor-pointer" onClick={() => setShow(false)}/>
         ) : (
-          <FaChevronRight className="text-stone-400 text-xs" />
+          <FaChevronRight className="text-stone-400 text-xs cursor-pointer" onClick={() => setShow(true)}/>
         )}
       </div>
       <div
@@ -101,6 +111,7 @@ export const DropdownSelect = <T,>({
           {types.map((type, i) => (
             <li key={type.label}>
               <button
+                tabIndex={-1}
                 onMouseDown={() => {
                   handleSelect(type);
                 }}

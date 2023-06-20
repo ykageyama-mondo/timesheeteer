@@ -9,11 +9,11 @@ import { logger } from '@/helpers/logger';
 import { retryUntilTrue } from '@/helpers/retry';
 import { TimeRecord } from '@/models/timeRecord';
 
-export const executeFill = async () => {
+export const executeFill = async ({records}: {records: TimeRecord[]}) => {
   logger.debug('Fill button handler called');
   try {
-    await fillDay(preset);
-    await save();
+    await fillDay(records);
+    // await save();
   } catch (error) {
     logger.error('Error filling day');
     alert(
@@ -22,9 +22,9 @@ export const executeFill = async () => {
   }
 };
 
-const fillDay = async (record: TimeRecord[], numRetries = 2) => {
+const fillDay = async (records: TimeRecord[], numRetries = 2) => {
   try {
-    for (const [index, record] of preset.entries()) {
+    for (const [index, record] of records.entries()) {
       await clickRecordButton();
       const recordLi = await getRelevantAttendanceListItem(index);
       simulateMouseEvent(recordLi, 'mouseover', 'click');
@@ -51,7 +51,7 @@ const fillDay = async (record: TimeRecord[], numRetries = 2) => {
         `Critical Failure during day record fill. Retrying ${numRetries} more times`
       );
       await cancel();
-      await fillDay(record, numRetries - 1);
+      await fillDay(records, numRetries - 1);
     } else {
       throw error;
     }
@@ -93,48 +93,6 @@ async function getSections(props: {
 
 type UnwrapPromise<T> = T extends Promise<infer U> ? U : T;
 type Sections = UnwrapPromise<ReturnType<typeof getSections>>;
-
-const preset: TimeRecord[] = [
-  {
-    startTime: '09:00',
-    endTime: '12:00',
-    timeType: 'Normal Time',
-    workType: 'Network',
-    workCode: '4009962_0020',
-  },
-  {
-    startTime: '12:00',
-    endTime: '13:00',
-    timeType: 'Break',
-    workType: 'None',
-  },
-  {
-    startTime: '13:00',
-    endTime: '14:30',
-    timeType: 'Normal Time',
-    workType: 'None',
-  },
-  {
-    startTime: '14:30',
-    endTime: '16:30',
-    timeType: 'Normal Time',
-    workType: 'Network',
-    workCode: '4009962_0020',
-  },
-  {
-    startTime: '16:30',
-    endTime: '17:00',
-    timeType: 'Normal Time',
-    workType: 'None',
-  },
-  {
-    startTime: '17:00',
-    endTime: '17:30',
-    timeType: 'Normal Time',
-    workType: 'Network',
-    workCode: '4009962_0020',
-  },
-];
 
 const sapQueries = {
   dialog: 'section.sapMDialogSection',

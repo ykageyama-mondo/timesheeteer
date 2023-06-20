@@ -41,7 +41,7 @@ export const CalendarModal: React.FC<Props> = ({
         prevLabel={<MdChevronLeft className="ml-1 h-6 w-6 text-stone-50" />}
         nextLabel={<MdChevronRight className="ml-1 h-6 w-6 text-stone-50" />}
       />
-      <button className="w-full px-4 py-2 bg-rose-500 text-stone-50 font-bold text-sm rounded-full mt-2" onClick={() => {setShow(false); onSubmit(dates)}}>
+      <button type='button' className="w-full px-4 py-2 bg-rose-500 text-stone-50 font-bold text-sm rounded-full mt-2" onClick={() => {setShow(false); onSubmit(dates)}}>
         {dates.length} days
       </button>
     </div>
