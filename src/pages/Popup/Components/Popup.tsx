@@ -16,7 +16,6 @@ import {Control, FieldErrors, FormProvider, useFieldArray, useForm, useFormConte
 const today = new Date()
 
 const validateRecordsAndAlert = (records: RecordItem[]): records is ValidatedRecordItem[] => {
-  logger.log(records)
   if (records.length === 0) {
     toast.error('Add at least one record')
     return false
@@ -32,7 +31,6 @@ const validateRecordsAndAlert = (records: RecordItem[]): records is ValidatedRec
       toast.error('You gotta fill in all the fields')
       return false
     }
-    logger.log(record.timeType)
     if (record.timeType !== 'Break' && record.workType === undefined) {
       toast.error('You gotta select a work type')
       return false
@@ -73,7 +71,6 @@ const Popup = () => {
   const [showCalendar, setShowCalendar] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
 
-  logger.log(localStorage.getItem('formData'))
   const methods = useForm<FormData>({
     defaultValues: localStorage.getItem('formData') ? JSON.parse(localStorage.getItem('formData')!) : {records: []},
     resetOptions: {
@@ -83,13 +80,9 @@ const Popup = () => {
 
   // cache records in local storage
   useEffect(() => {
-
     const sub = watch((value) => {
-
-      logger.log(value)
       localStorage.setItem('formData', JSON.stringify(value))
     })
-
     return () => {
       sub.unsubscribe()
     }
@@ -150,7 +143,7 @@ const Popup = () => {
     }
 
     if (e.records && e.records.length) {
-      toast.error(e.records[0]!.message ?? `There was an error with your records. Should probably make sure they're correct`)
+      toast.error(e.records[0]!.message ?? `There was an error with your records. You probably missed a field or something.`)
       return
     }
   }

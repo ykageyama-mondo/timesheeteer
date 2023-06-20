@@ -146,7 +146,7 @@ const Record = ({onRemove, index}: {
 
 export const RecordList = () => {
 
-  const lenMessage = `What's the point of me existing if you don't record any times? 😠`
+  const lenMessage = `I think you forgot something. Not sure what... Might be your ENTIRE TIMESHEET 😠`
 
   const {control} = useFormContext()
   const {append, fields, remove} = useFieldArray({
