@@ -58,7 +58,7 @@ const Popup = () => {
   const methods = useForm<FormData>({
     defaultValues: localStorage.getItem('formData') ? JSON.parse(localStorage.getItem('formData')!) : {records: []},
     resetOptions: {
-    }
+    },
   })
   const {handleSubmit, reset, watch} = methods
 
@@ -113,6 +113,10 @@ const Popup = () => {
     chrome.runtime.sendMessage({action: 'fill', data: {records: payload}}, async (response) => {
       logger.log('Response from background service', response)
       setIsLoading(false)
+
+      if (response?.success) {
+        window.close()
+      }
     })
   }
 
