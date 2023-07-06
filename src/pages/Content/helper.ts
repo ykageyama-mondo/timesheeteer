@@ -13,7 +13,7 @@ export const executeFill = async ({records}: {records: TimeRecord[]}) => {
   logger.debug('Fill button handler called');
   try {
     await fillDay(records);
-    // await save();
+    await save();
   } catch (error) {
     logger.error('Error filling day');
     alert(
