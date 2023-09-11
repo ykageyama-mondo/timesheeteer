@@ -6,7 +6,7 @@ import {
   ReactElement,
 } from 'react';
 import {useFormContext} from 'react-hook-form'
-import { FaChevronCircleDown, FaChevronRight } from 'react-icons/fa';
+import { FaChevronCircleUp, FaChevronDown } from 'react-icons/fa';
 
 interface DropdownSelectProps {
   options: string[];
@@ -98,9 +98,9 @@ export const DropdownSelect = ({
           {...rest}
         />
         {show ? (
-          <FaChevronCircleDown className="p-1 h-6 w-6 text-stone-600 text-xs cursor-pointer" onClick={() => setShow(false)}/>
-        ) : (
-          <FaChevronRight className="p-1 h-6 w-6 text-stone-400 text-xs cursor-pointer" onClick={() => setShow(true)}/>
+          <FaChevronCircleUp className="p-1 h-6 w-6 text-stone-400 text-xs cursor-pointer" onClick={() => setShow(false)}/>
+          ) : (
+          <FaChevronDown className="p-1 h-6 w-6 text-stone-600 text-xs cursor-pointer" onClick={() => {setShow(true); inputRef.current?.focus()}}/>
         )}
       </div>
       <div

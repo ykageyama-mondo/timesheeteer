@@ -1,5 +1,6 @@
 import {atom} from 'jotai'
 import {RecordItem} from '../Models'
+import {PageKey} from '../Models/pages'
 
 const _recordsAtom = atom<RecordItem[]>([])
 export const recordsAtom = atom<RecordItem[], ([{type?: 'Add', record: RecordItem, index?: number} | {type: 'Remove', index: number}]), RecordItem[]>(
@@ -17,3 +18,5 @@ export const recordsAtom = atom<RecordItem[], ([{type?: 'Add', record: RecordIte
     return newRecords
   }
 )
+
+export const pageAtom = atom<PageKey>('home')

@@ -18,8 +18,8 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
           logger.warn('No tabs found. Creating new tab and retrying.')
           await new Promise<void>(async (resolve) => {
             const tab = await chrome.tabs.create({url: 'https://performancemanager10.successfactors.com/sf/timesheet', active: true})
-            setTimeout(() => {
-              sendFill(tab.id!, request.data)
+            setTimeout(async () => {
+              await sendFill(tab.id!, request.data)
               resolve()
             }, 10000)
           })
