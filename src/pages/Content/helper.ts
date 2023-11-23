@@ -27,7 +27,7 @@ const fillDay = async (records: TimeRecord[], numRetries = 2) => {
     for (const [index, record] of records.entries()) {
       await clickRecordButton();
       const recordLi = await getRelevantAttendanceListItem(index);
-      simulateMouseEvent(recordLi, 'mouseover', 'click');
+      await simulateMouseEvent(recordLi);
       let sections = await getSections({ parent: recordLi });
       await fillTimeType(sections, record.timeType);
       await fillDuration(sections, record.startTime, record.endTime);
@@ -109,7 +109,7 @@ const clickRecordButton = async () => {
   const recordBtn = await getElement(sapQueries.recordButton, {
     maxRetries: 100,
   });
-  simulateMouseEvent(recordBtn, 'mousedown', 'click');
+  await simulateMouseEvent(recordBtn);
 };
 
 const getRelevantAttendanceListItem = async (index: number) => {
@@ -176,7 +176,7 @@ const fillWorkType = async (sections: Sections, workType: string) => {
     parent: sections.workType,
   });
 
-  simulateMouseEvent(workTypeButton, 'mousedown', 'click');
+  await simulateMouseEvent(workTypeButton);
   const workTypeDialog = await getElement(sapQueries.dialog);
 
   const table = await getElement('table', { parent: workTypeDialog });
@@ -189,8 +189,8 @@ const fillWorkType = async (sections: Sections, workType: string) => {
   const workTypeRow = [...rows].find((row) =>
     row.innerHTML?.includes(workType)
   );
-  if (!workTypeRow) throw new Error('Network row not found');
-  simulateMouseEvent(workTypeRow, 'mousedown', 'click');
+  if (!workTypeRow) throw new Error(`${workType} row not found`);
+  await simulateMouseEvent(workTypeRow);
 
   await retryUntilTrue(100, async () => {
     try {
@@ -210,7 +210,7 @@ const fillWorkCode = async (sections: Sections, workCode: string) => {
     parent: sections.workCode,
   });
 
-  simulateMouseEvent(workCodeButton, 'mousedown', 'click');
+  await simulateMouseEvent(workCodeButton);
   const workCodeDialog = await getElement(sapQueries.dialog);
 
   const workCodeSearch = await getElement('input', {
@@ -242,19 +242,13 @@ const fillWorkCode = async (sections: Sections, workCode: string) => {
   if (workCodeRows.length > 1)
     throw new Error('Too many rows found in work code table');
 
-  simulateMouseEvent(
-    workCodeRows[0],
-    'mouseover',
-    'mousedown',
-    'click',
-    'mouseup'
-  );
+  await simulateMouseEvent(workCodeRows[0]);
 };
 
 const save = async () => {
   logger.debug('Saving');
   const saveButton = await getElement(sapQueries.saveButton);
-  simulateMouseEvent(saveButton.children[0], 'mousedown', 'click', 'mouseup');
+  await simulateMouseEvent(saveButton.children[0]);
 
   const loadingOverlay = await getElement(sapQueries.loadingOverlay);
 
@@ -268,7 +262,7 @@ const save = async () => {
 const cancel = async () => {
   logger.debug('Cancelling');
   const cancelButton = await getElement(sapQueries.cancelButton);
-  simulateMouseEvent(cancelButton.children[0], 'mousedown', 'click', 'mouseup');
+  await simulateMouseEvent(cancelButton.children[0]);
 
   const loadingOverlay = await getElement(sapQueries.loadingOverlay);
 
@@ -295,7 +289,7 @@ const collapseSections = async (index: number) => {
         'button[aria-label="Expand/Collapse"][aria-expanded="true"]',
         { parent: li, maxRetries: 2 }
       );
-      simulateMouseEvent(collapseButton, 'mousedown', 'click', 'mouseup');
+      await simulateMouseEvent(collapseButton);
     } catch (error) {
       logger.debug('Record already collapsed');
     }

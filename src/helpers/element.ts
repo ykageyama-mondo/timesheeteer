@@ -1,29 +1,33 @@
 import {delay} from './delay'
 import {logger} from './logger'
 
-export const simulateMouseEvent = function (
+export const simulateMouseEvent = async (
   element: Element,
-  ...eventNames: string[]
-) {
+) => {
   logger.debug(
-    `Simulating mouse events ${eventNames} on element ${element.id}`
+    `Simulating mouse events on element ${element.id}`
   );
-
+  logger.debug(`Scrolling element ${element.id} into view`)
+  await new Promise<void>(resolve => {
+    chrome.runtime.sendMessage({
+        action: 'scrollIntoView', 
+        data: {el: `${element.id ? `#${element.id}` : ''}.${element.className.split(' ').join('.')}`}
+      },
+       () => {
+        resolve()
+      }
+    )
+  })
   const box = element.getBoundingClientRect(),
-    coordX = box.left + (box.right - box.left) / 2,
-    coordY = box.top + (box.bottom - box.top) / 2;
-  for (const eventName of eventNames) {
-    element.dispatchEvent(
-      new MouseEvent(eventName, {
-        view: window,
-        bubbles: true,
-        cancelable: true,
-        clientX: coordX,
-        clientY: coordY,
-        button: 0,
-      })
-    );
-  }
+  coordX = box.left + (box.right - box.left) / 2,
+  coordY = box.top + (box.bottom - box.top) / 2;
+  logger.debug(`Clicking element ${element.id} at ${coordX}, ${coordY}`)
+  await new Promise<void>(resolve => chrome.runtime.sendMessage({
+      action: 'click',
+      data: {coordX, coordY}
+    },
+    () => resolve()
+  ))
 };
 
 export const getElement = async <T extends Element = HTMLElement>(

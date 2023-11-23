@@ -5,6 +5,7 @@ import './index.css'
 import '../../assets/styles/tailwind.css';
 import {executeFill} from './helper'
 
+logger.setContext('Content')
 const observer = new MutationObserver(() => {
   const toolbar = document.querySelector('#__component1---timeRecordingView--timeRecordingTitle-_actionsToolbar')
   const mycont = document.querySelector('#injected-container')
@@ -25,14 +26,16 @@ window.addEventListener('load', () => {
   })
 })
 
-chrome.runtime.onMessage.addListener(async (request, sender, sendResponse) => {
+chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   logger.log('Received Fill Message. Executing fill')
   logger.log(request)
-  if (request.action === 'executeFill') {
-    logger.log('Received Fill Message. Executing fill')
-    await executeFill(request.data)
-  }
-  sendResponse({success: true})
-  return
+  new Promise<void>(async (resolve) => {
+    if (request.action === 'executeFill') {
+      logger.log('Received Fill Message. Executing fill')
+      executeFill(request.data)
+    }
+    sendResponse({success: true})
+    resolve()
+  })
+  return true
 })
-
