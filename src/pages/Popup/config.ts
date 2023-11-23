@@ -13,3 +13,7 @@ export const workTypes = {
 }
 
 export const workOptions =  Object.keys(workTypes)
+
+export const localStorageKeys = {
+  prevPage : 'prevPage',
+}

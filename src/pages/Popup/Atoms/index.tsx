@@ -1,6 +1,7 @@
 import {atom} from 'jotai'
 import {RecordItem} from '../Models'
 import {PageKey} from '../Models/pages'
+import {localStorageKeys} from '../config'
 
 const _recordsAtom = atom<RecordItem[]>([])
 export const recordsAtom = atom<RecordItem[], ([{type?: 'Add', record: RecordItem, index?: number} | {type: 'Remove', index: number}]), RecordItem[]>(
@@ -19,4 +20,4 @@ export const recordsAtom = atom<RecordItem[], ([{type?: 'Add', record: RecordIte
   }
 )
 
-export const pageAtom = atom<PageKey>('home')
+export const pageAtom = atom<PageKey>(localStorage.getItem(localStorageKeys.prevPage) as PageKey ?? 'home')

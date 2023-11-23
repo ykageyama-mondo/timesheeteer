@@ -1,6 +1,8 @@
 import { FiHome, FiSettings, FiSliders } from 'react-icons/fi';
-import {useSetAtom} from 'jotai'
+import {useAtom} from 'jotai'
 import {pageAtom} from '../Atoms'
+import {localStorageKeys} from '../config'
+import {useEffect} from 'react'
 const ToolbarButton = ({
   icon,
   label,
@@ -21,7 +23,11 @@ const ToolbarButton = ({
 };
 
 export const Footer = () => {
-  const setPage = useSetAtom(pageAtom)
+  const [page, setPage] = useAtom(pageAtom)
+
+  useEffect(() => {
+    localStorage.setItem(localStorageKeys.prevPage, page)
+  }, [page, setPage])
 
   return (
     <div className="rounded-t-xl flex items-center justify-center gap-4 absolute bottom-0 bg-rose-500 w-full h-12">
