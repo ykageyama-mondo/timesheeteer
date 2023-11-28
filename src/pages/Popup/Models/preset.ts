@@ -5,5 +5,3 @@ export interface Preset {
   name: string;
   records: Optional<DeepRequire<RecordItem>, 'workType'>[]
 }
-
-declare const pre: Preset

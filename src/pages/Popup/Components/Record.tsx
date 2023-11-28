@@ -1,9 +1,11 @@
 import { DropdownSelect } from '@/components/DropdownSelect';
 import { ChangeEvent, useEffect } from 'react';
-import { FaFillDrip, FaPlus, FaTrash } from 'react-icons/fa';
+import { FaFillDrip, FaTrash } from 'react-icons/fa';
 import { useFieldArray, useFormContext } from 'react-hook-form';
-import { expandTimeTypes, timeOptions, workOptions } from '../config';
+import { expandTimeTypes, timeOptions } from '../config';
 import { FiPlus, FiSave } from 'react-icons/fi';
+import {useAtomValue} from 'jotai'
+import {workTypeAtom} from '../Atoms'
 
 interface TimePickerProps {
   name: string;
@@ -99,7 +101,7 @@ const Record = ({
   const { watch, unregister } = useFormContext();
 
   const timeType = watch(`records.${index}.timeType` as const);
-
+  const workTypes = useAtomValue(workTypeAtom)
   useEffect(() => {
     if (!expandTimeTypes.includes(timeType)) {
       unregister(`records.${index}.workType` as const);
@@ -136,7 +138,7 @@ const Record = ({
         >
           on{' '}
           <DropdownSelect
-            options={workOptions}
+            options={Object.keys(workTypes)}
             placeHolder="CAPEX"
             name={`records.${index}.workType` as const}
           />{' '}

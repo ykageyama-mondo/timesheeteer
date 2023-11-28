@@ -13,14 +13,14 @@ import toast, { Toaster } from 'react-hot-toast';
 import { Preset, RecordItem, ValidatedRecordItem } from '../Models';
 import { TimeRecord, WorkType } from '@/models/timeRecord';
 import { FieldErrors, FormProvider, useForm } from 'react-hook-form';
-import { presetKeyPrefix, timeTypes, workTypes } from '../config';
+import { presetKeyPrefix, timeTypes } from '../config';
 import { PresetPage } from './Preset';
 import { PageKey } from '../Models/pages';
-import { useAtom, useSetAtom } from 'jotai';
-import { pageAtom, presetAtom } from '../Atoms';
+import { useAtom, useAtomValue, useSetAtom } from 'jotai';
+import { pageAtom, presetAtom, workTypeAtom } from '../Atoms';
 import { v4 as generateUuid } from 'uuid';
-import {Dialog} from '@/components/Dialog'
-import {PresetDialog} from './PresetDialog'
+import {PresetDialog} from './Dialogs/PresetDialog'
+import {SettingsPage} from './Settings'
 
 const today = new Date();
 
@@ -34,19 +34,18 @@ const defaultWorkTypeMap: Record<string, WorkType> = {
   },
 };
 
-const transformRecords = (records: ValidatedRecordItem[]): TimeRecord[] => {
+const transformRecords = (records: ValidatedRecordItem[], workTypes: Record<string, WorkType>): TimeRecord[] => {
   return records.map((record) => {
     const { from, to, timeType, workType } = record;
     const startTime = `${from.hour}:${from.min}`;
     const endTime = `${to.hour}:${to.min}`;
 
     const timeTypeValue = (timeTypes as Record<string, string>)[timeType];
-    const workTypeValue = (workTypes as Record<string, string>)[workType];
 
     const mappedWorkType =
       timeTypeValue === 'Break'
         ? { workType: 'None' }
-        : defaultWorkTypeMap[workTypeValue];
+        : workTypes[workType];
     return {
       startTime,
       endTime,
@@ -70,6 +69,7 @@ const Popup = () => {
   const [showCalendar, setShowCalendar] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [showDialog, setShowDialog] = useState(false);
+  const workTypes = useAtomValue(workTypeAtom)
 
   const setPresets = useSetAtom(presetAtom)
 
@@ -126,7 +126,7 @@ const Popup = () => {
 
   const onFill = (formData: FormData) => {
     setIsLoading(true);
-    const payload = transformRecords(formData.records as ValidatedRecordItem[]);
+    const payload = transformRecords(formData.records as ValidatedRecordItem[], workTypes);
     logger.log('Sending fill command to background service.', payload);
 
     chrome.runtime.sendMessage(
@@ -212,7 +212,7 @@ const Popup = () => {
       case 'presets':
         return <PresetPage onApply={onApplyPreset}/>;
       case 'settings':
-        return <div>Settings</div>;
+        return <SettingsPage/>;
       case 'home':
         return (
           <FormProvider {...methods}>

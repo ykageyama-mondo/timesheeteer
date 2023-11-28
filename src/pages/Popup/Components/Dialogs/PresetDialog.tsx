@@ -17,6 +17,7 @@ export const PresetDialog: React.FC<Props> = ({
 
   const handleSubmit = () => {
     if (name.length === 0) {
+      toast.length > 0 && toast.dismiss();
       toast.error('Name cannot be empty');
       return;
     };

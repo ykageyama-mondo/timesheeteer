@@ -1,7 +1,6 @@
 import { logger } from '@/helpers/logger';
 import { Preset } from '../Models';
 import { useMemo, useState } from 'react';
-import { v4 as generateUuid } from 'uuid';
 import { Footer } from './Footer';
 import {
   FiChevronsDown,
