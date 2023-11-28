@@ -8,18 +8,24 @@ Timesheeting sucks. Especially in Success Factors. This is a tool to make it suc
 2. Unzip the file
 3. Load your extension in Chrome:
    1. Go to `chrome://extensions/`
-   2. Check Developer mode
+   2. Toggle Developer mode
    3. Click on Load unpacked extension
    4. Select the folder with the unzipped files.
 
 ## Local Development
+
+Requirements:
+
+- node version 16
+- pnpm
+
 
 1. Clone this repo
 2. Run `pnpm install`
 3. Run `pnpm start`
 3. Load your extension in Chrome:
    1. Go to `chrome://extensions/`
-   2. Check Developer mode
+   2. Toggle Developer mode
    3. Click on Load unpacked extension
    4. Select the `build` folder.
 
