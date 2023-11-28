@@ -18,7 +18,7 @@ jobs:
       - uses: actions/setup-node@v2
         with:
           node-version-file: '.nvmrc'
-      - run: pnpm ci
+      - run: pnpm i
       - run: pnpm run build
       - run: pnpm run package
       - name: Release
