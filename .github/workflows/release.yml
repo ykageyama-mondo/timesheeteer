@@ -21,8 +21,17 @@ jobs:
       - run: pnpm i
       - run: pnpm run build
       - run: pnpm run package
-      - run: git tag ${{ github.sha }}
-      - name: Release
-        uses: softprops/action-gh-release@v1
+      - name: Get version
+        run: echo "VERSION=$(cat build/manifest.json | jq -r '.version')" >> $GITHUB_ENV
+      - name: Tag version
+        id: tag
+        uses: anothrNick/github-tag-action@1.34.0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          CUSTOM_TAG: v${VERSION}
+      - name: 🛎️ Create release
+        uses: ncipollo/release-action@v1
         with:
-          files: output/timesheeteer.zip
+          token: ${{ secrets.GITHUB_TOKEN }}
+          tag: ${{ steps.tag.outputs.tag }}
+          draft: true
