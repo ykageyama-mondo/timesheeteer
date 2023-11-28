@@ -4,10 +4,20 @@ Timesheeting sucks. Especially in Success Factors. This is a tool to make it suc
 
 ## Installation
 
-1. Check if your Node.js version is >= 18.
-2. Run `npm install` to install the dependencies.
-3. Run `npm run build` to build the extension.
-4. Load your extension on Chrome following:
+1. Download the [latest release](https://github.com/ykageyama-mondo/timesheeteer/releases/latest/download/timesheeteer.zip)
+2. Unzip the file
+3. Load your extension on Chrome following:
+   1. Go to `chrome://extensions/`
+   2. Check Developer mode
+   3. Click on Load unpacked extension
+   4. Select the folder with the unzipped files.
+
+## Local Development
+
+1. Clone this repo
+2. Run `pnpm install`
+3. Run `pnpm start`
+3. Load your extension on Chrome following:
    1. Go to `chrome://extensions/`
    2. Check Developer mode
    3. Click on Load unpacked extension
@@ -16,8 +26,10 @@ Timesheeting sucks. Especially in Success Factors. This is a tool to make it suc
 ## Features
 
 - [x] Auto fill timesheet
-- [ ] Ability to set presets
-- [ ] Ability to add multiple records
-- [ ] Ability to add multiple days
+- [x] Ability to set presets
+- [x] Store presets in local storage
+- [x] Ability to add multiple records
+- [x] Ability to add multiple days
 - [ ] Ability to add multiple weeks
-- [ ] Store presets in local storage
+- [ ] Ability to import and export presets to JSON files
+- [ ] Ability to abort a fill operation
