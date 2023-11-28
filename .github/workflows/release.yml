@@ -20,19 +20,26 @@ jobs:
       - uses: actions/setup-node@v2
         with:
           node-version-file: '.nvmrc'
+      - name: Get pnpm store directory
+        shell: bash
+        run: |
+          echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_ENV
+      - uses: actions/cache@v3
+        name: Setup pnpm cache
+        with:
+          path: ${{ env.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
+
       - run: pnpm i
       - run: pnpm run build
       - run: pnpm run package
       - name: Get version
-        run: echo "VERSION=$(cat build/manifest.json | jq -r '.version')" >> $GITHUB_ENV
-      - name: Tag version
-        id: tag
-        uses: anothrNick/github-tag-action@1.34.0
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          CUSTOM_TAG: v${VERSION}
+        run: echo "VERSION=$(cat src/manifest.json | jq -r '.version')" >> $GITHUB_ENV
       - name: Create release
         uses: ncipollo/release-action@v1
         with:
-          tag: ${{ steps.tag.outputs.tag }}
+          tag: "v$VERSION"
           draft: true
+          commit: ${{ github.sha }}
