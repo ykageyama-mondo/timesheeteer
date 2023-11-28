@@ -17,9 +17,8 @@ export const executeFill = async ({records}: {records: TimeRecord[]}) => {
     await save();
   } catch (error) {
     logger.error('Error filling day');
-    alert(
-      'Error filling day because SAP is bad. Please refresh the page and try again. If it still fails let me know :)'
-    );
+    throw error;
+
   }
 };
 
@@ -249,8 +248,6 @@ const save = async () => {
   await retryUntilTrue(1000, async () => {
     return loadingOverlay.style.display === 'none';
   });
-
-  await delay(5000);
 };
 
 const cancel = async () => {

@@ -1,20 +1,28 @@
 import {logger} from '@/helpers/logger'
 import {render} from 'react-dom'
-import FillButton from './FillButton'
+import Toaster from './Toaster'
 import './index.css'
 import '../../assets/styles/tailwind.css';
 import {executeFill} from './helper'
 
+const subscribers: Array<(action: string, data?: any) => void> = []
+export const observable = {
+  subscribe: (fn: (action: string, data?: any) => void) => {
+    subscribers.push(fn)
+  },
+  notify: (action: string, data?: any) => {
+    subscribers.forEach((fn) => fn(action, data))
+  },
+}
+
 logger.setContext('Content')
 const observer = new MutationObserver(() => {
-  const toolbar = document.querySelector('#__component1---timeRecordingView--timeRecordingTitle-_actionsToolbar')
   const mycont = document.querySelector('#injected-container')
-  if (toolbar && !mycont) {
+  if (document.body && !mycont) {
     const cont = document.createElement('div')
-    cont.className = 'tailwind'
     cont.id = 'injected-container'
-    toolbar.appendChild(cont)
-    render(<FillButton/>, cont)
+    document.body.appendChild(cont)
+    render(<Toaster/>, cont)
   }
 })
 
@@ -27,15 +35,20 @@ window.addEventListener('load', () => {
 })
 
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-  logger.log('Received Fill Message. Executing fill')
   logger.log(request)
   new Promise<void>(async (resolve) => {
     if (request.action === 'executeFill') {
+      observable.notify('start', {size: request.data.records.length})
       logger.log('Received Fill Message. Executing fill')
-      executeFill(request.data)
+      executeFill(request.data).then(() =>  {
+        observable.notify('success')
+      }).catch(() => {
+        observable.notify('error')
+      })
     }
     sendResponse({success: true})
     resolve()
   })
+
   return true
 })
