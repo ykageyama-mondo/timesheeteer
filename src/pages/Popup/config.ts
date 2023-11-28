@@ -17,3 +17,5 @@ export const workOptions =  Object.keys(workTypes)
 export const localStorageKeys = {
   prevPage : 'prevPage',
 }
+
+export const presetKeyPrefix = 'presets-';
