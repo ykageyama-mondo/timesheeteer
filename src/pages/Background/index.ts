@@ -1,4 +1,5 @@
 import { delay } from '@/helpers/delay';
+import {isSupportedKey, supportedKeys} from '@/helpers/keyCode'
 import { logger } from '@/helpers/logger';
 import { TimeRecord } from '@/models/timeRecord';
 logger.setContext('Background');
@@ -58,7 +59,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
               clickCount: 1,
             },
             () => {
-              logger.log('mousePress Debugger send command callback');
+              logger.log('mousePress send command callback');
               res();
             }
           );
@@ -76,7 +77,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
               clickCount: 1,
             },
             () => {
-              logger.log('mouseRelease Debugger send command callback');
+              logger.log('mouseRelease send command callback');
               res();
             }
           );
@@ -117,18 +118,20 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
         break;
       }
       case 'keyDown': {
+        const keyCode = request.data.keyCode;
+        if (!isSupportedKey(keyCode))
+          break;
+
         await new Promise<void>((res) => {
           chrome.debugger.sendCommand(
             { tabId },
             'Input.dispatchKeyEvent',
             {
               type: 'keyDown',
-              windowsVirtualKeyCode: 13,
-              unmodifiedText: '\r',
-              text: '\r',
+              ...supportedKeys[keyCode],
             },
             () => {
-              logger.log('mouseRelease Debugger send command callback');
+              logger.log('keyDown send command callback');
               res();
             }
           );

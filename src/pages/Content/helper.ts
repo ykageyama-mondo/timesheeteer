@@ -4,6 +4,7 @@ import {
   getElement,
   simulateMouseEvent,
   waitForValue,
+  simulateKeyboardEvent,
 } from '@/helpers/element';
 import { logger } from '@/helpers/logger';
 import { retryUntilTrue } from '@/helpers/retry';
@@ -190,6 +191,7 @@ const fillWorkType = async (sections: Sections, workType: string) => {
     row.innerHTML?.includes(workType)
   );
   if (!workTypeRow) throw new Error(`${workType} row not found`);
+  await delay(250)
   await simulateMouseEvent(workTypeRow);
 
   await retryUntilTrue(100, async () => {
@@ -218,16 +220,8 @@ const fillWorkCode = async (sections: Sections, workCode: string) => {
   });
 
   (workCodeSearch as HTMLInputElement).value = workCode;
-  for (const ev of [
-    'keydown',
-    'keyup',
-    'keypress',
-    'change',
-    'input',
-    'focusout',
-  ]) {
-    workCodeSearch.dispatchEvent(new Event(ev, { bubbles: true }));
-  }
+  await delay(250)
+  await simulateKeyboardEvent(workCodeSearch, 'Enter')
   const workCodeTable = await getElement('table tbody', {
     parent: workCodeDialog,
   });

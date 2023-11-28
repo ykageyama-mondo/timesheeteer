@@ -1,4 +1,5 @@
 import {delay} from './delay'
+import {KeyCode} from './keyCode'
 import {logger} from './logger'
 
 export const simulateMouseEvent = async (
@@ -29,6 +30,24 @@ export const simulateMouseEvent = async (
     () => resolve()
   ))
 };
+
+export const simulateKeyboardEvent = async (
+  element: Element,
+  keyCode: KeyCode,
+) => {
+  logger.debug(
+    `Simulating keyboard events on element ${element.id}`
+  );
+  logger.debug(`Simulating ${keyCode} event`)
+
+  element.dispatchEvent(new FocusEvent('focus'))
+  await new Promise<void>(resolve => chrome.runtime.sendMessage({
+      action: 'keyDown',
+      data: {keyCode}
+    },
+    () => resolve()
+  ))
+}
 
 export const getElement = async <T extends Element = HTMLElement>(
   selector: string,
