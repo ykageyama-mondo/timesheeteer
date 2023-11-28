@@ -40,7 +40,8 @@ jobs:
       - name: Create release
         uses: ncipollo/release-action@v1
         with:
-          tag: ${{VERSION}}
+          tag: ${{ env.VERSION }}
           draft: true
           commit: ${{ github.sha }}
           artifacts: output/*
+          generateReleaseNotes: true
