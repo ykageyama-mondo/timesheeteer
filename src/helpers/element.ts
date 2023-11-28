@@ -11,7 +11,7 @@ export const simulateMouseEvent = async (
   logger.debug(`Scrolling element ${element.id} into view`)
   await new Promise<void>(resolve => {
     chrome.runtime.sendMessage({
-        action: 'scrollIntoView', 
+        action: 'scrollIntoView',
         data: {el: `${element.id ? `#${element.id}` : ''}.${element.className.split(' ').join('.')}`}
       },
        () => {
@@ -101,22 +101,57 @@ export const getElements = async (
   return el;
 };
 
+interface Opts {
+  maxRetries?: number;
+  exact?: boolean
+}
 export const waitForValue = async (
   element: HTMLInputElement | HTMLSelectElement,
   desiredValue: string,
-  maxRetries = 10
+  opts?: Opts
 ): Promise<boolean> => {
+  const maxRetries = opts?.maxRetries || 10;
+  const exact = opts?.exact || true;
+
   logger.debug(`Waiting for value ${desiredValue} in element ${element.id}`);
 
   let retries = 0;
-  while (element.value !== desiredValue && retries < maxRetries) {
+  const matcher = (v: string) => exact ? v === desiredValue : v.includes(desiredValue)
+
+  while (retries < maxRetries && !matcher(element.value)) {
     await delay(500);
 
     retries++;
   }
-  if (element.value !== desiredValue) {
+  if (!matcher(element.value)) {
     throw new Error(
-      `Element ${element.id} value is ${element.value}, expected ${desiredValue}`
+      `Element ${element.id} inner html is ${element.value}, expected ${desiredValue}`
+    );
+  }
+  return true;
+};
+
+export const waitForInnerHtml = async (
+  element: Element,
+  desiredValue: string,
+  opts?: Opts
+): Promise<boolean> => {
+  const maxRetries = opts?.maxRetries ?? 10;
+  const exact = opts?.exact ?? true;
+
+  logger.debug(`Waiting for inner html ${desiredValue} in element ${element.id}`);
+
+  let retries = 0;
+  const matcher = (v: string) => exact ? v === desiredValue : v.includes(desiredValue)
+
+  while (retries < maxRetries && !matcher(element.innerHTML)) {
+    await delay(500);
+
+    retries++;
+  }
+  if (!matcher(element.innerHTML)) {
+    throw new Error(
+      `Element ${element.id} inner html is ${element.innerHTML}, expected ${desiredValue}`
     );
   }
   return true;

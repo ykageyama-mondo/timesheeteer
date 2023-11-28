@@ -1,3 +1,4 @@
+import {getWeekDay} from '@/helpers/date'
 import { delay } from '@/helpers/delay';
 import {
   getElements,
@@ -5,22 +6,49 @@ import {
   simulateMouseEvent,
   waitForValue,
   simulateKeyboardEvent,
+  waitForInnerHtml,
 } from '@/helpers/element';
 import { logger } from '@/helpers/logger';
 import { retryUntilTrue } from '@/helpers/retry';
 import { TimeRecord } from '@/models/timeRecord';
 
-export const executeFill = async ({records}: {records: TimeRecord[]}) => {
+export const executeFill = async ({records, dates}: {records: TimeRecord[], dates: Date[]}) => {
   logger.debug('Fill button handler called');
-  try {
-    await fillDay(records);
-    await save();
-  } catch (error) {
-    logger.error('Error filling day');
-    throw error;
-
+  for (const date of dates) {
+    try {
+      await selectDay(date);
+      await fillDay(records);
+      await save();
+    } catch (error) {
+      logger.error('Error filling day', error);
+      throw error;
+    }
   }
 };
+
+const sapQueries = {
+  dialog: 'section.sapMDialogSection',
+  attendanceList: 'ul.sapMListItems.sapMListUl[id*="attendancesClock"]',
+  recordButton: 'button[id*="attendancesClock--add"]',
+  sectionHeaders: 'div.sapUiFormElementLbl.sapUiRespGridBreak',
+  saveButton: 'button[id*="btnSaveTimeRecords"]',
+  cancelButton: 'button[id*="btnCancelTimeRecords"]',
+  loadingOverlay: '#sap-ui-blocklayer-popup',
+  dayListSection: 'section[id*="daysListSection"]',
+  selectedDay: 'span[id*="titleDate-inner"]'
+} as const;
+
+const selectDay = async (date: Date) => {
+  const dayName = getWeekDay(date)
+  const section = await getElement(sapQueries.dayListSection)
+  const table = await getElement('table', {parent: section})
+  const rows = await getElements('tr', {parent: table})
+  const dayRow = [...rows].find(row => row.innerHTML?.includes(dayName))
+  if (!dayRow) throw new Error('Day row not found')
+  await simulateMouseEvent(dayRow)
+  const selectedDay = await getElement(sapQueries.selectedDay)
+  await waitForInnerHtml(selectedDay, dayName.slice(0, 3), {exact: false})
+}
 
 const fillDay = async (records: TimeRecord[], numRetries = 2) => {
   try {
@@ -94,16 +122,6 @@ async function getSections(props: {
 type UnwrapPromise<T> = T extends Promise<infer U> ? U : T;
 type Sections = UnwrapPromise<ReturnType<typeof getSections>>;
 
-const sapQueries = {
-  dialog: 'section.sapMDialogSection',
-  attendanceList: 'ul.sapMListItems.sapMListUl[id*="attendancesClock"]',
-  recordButton: 'button[id*="attendancesClock--add"]',
-  sectionHeaders: 'div.sapUiFormElementLbl.sapUiRespGridBreak',
-  saveButton: 'button[id*="btnSaveTimeRecords"]',
-  cancelButton: 'button[id*="btnCancelTimeRecords"]',
-  loadingOverlay: '#sap-ui-blocklayer-popup',
-} as const;
-
 const clickRecordButton = async () => {
   logger.debug('Clicking record button');
   const recordBtn = await getElement(sapQueries.recordButton, {
@@ -130,7 +148,9 @@ export const fillTimeType = async (sections: Sections, timeType: string) => {
   const timeTypeInput = await getElement<HTMLInputElement>(`input`, {
     parent: sections.timeType,
   });
-  await waitForValue(timeTypeInput, 'Normal Time', 60);
+  await waitForValue(timeTypeInput, 'Normal Time', {
+    maxRetries: 60,
+  });
   timeTypeInput.value = timeType;
   for (const ev of ['focus', 'input']) {
     timeTypeInput.dispatchEvent(new Event(ev, { bubbles: true }));

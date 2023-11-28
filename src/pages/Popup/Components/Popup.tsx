@@ -4,7 +4,7 @@ import {
   FiCalendar,
 } from 'react-icons/fi';
 import { CalendarModal } from './Calendar';
-import { dateExists } from '@/helpers/date';
+import { dateExists, datesInSingleWeek } from '@/helpers/date';
 import dayjs from 'dayjs';
 import { LoadingOverlay } from './LoadingOverlay';
 import { RecordList } from './Record';
@@ -23,16 +23,6 @@ import {PresetDialog} from './Dialogs/PresetDialog'
 import {SettingsPage} from './Settings'
 
 const today = new Date();
-
-const defaultWorkTypeMap: Record<string, WorkType> = {
-  OPEX: {
-    workType: 'None',
-  },
-  CAPEX: {
-    workType: 'Network',
-    workCode: '4009962_0020',
-  },
-};
 
 const transformRecords = (records: ValidatedRecordItem[], workTypes: Record<string, WorkType>): TimeRecord[] => {
   return records.map((record) => {
@@ -124,13 +114,29 @@ const Popup = () => {
     return parts.join(' + ');
   };
 
+  const validateDates = (): boolean => {
+    if (dates.length === 0) {
+      toast.error('Please select at least one day');
+      return false;
+    }
+    if (!datesInSingleWeek(dates)) {
+      toast.error('All dates must be in the same week');
+      return false;
+    }
+    return true;
+  }
+
   const onFill = (formData: FormData) => {
+
+    if (!validateDates())
+      return
+
     setIsLoading(true);
     const payload = transformRecords(formData.records as ValidatedRecordItem[], workTypes);
     logger.log('Sending fill command to background service.', payload);
 
     chrome.runtime.sendMessage(
-      { action: 'fill', data: { records: payload } },
+      { action: 'fill', data: { records: payload, dates } },
       async (response) => {
         logger.log('Response from background service', response);
         setIsLoading(false);
@@ -220,8 +226,8 @@ const Popup = () => {
               onSubmit={handleSubmit(onFill, onValidationFailure)}
               onKeyPress={preventEnterKeySubmission}
             >
-              <div className="flex gap-2 mx-4 mt-4 items-bottom px-5">
-                <p className="cursor-pointer text-2xl font-bold text-rose-400" onClick={() => setShowCalendar(true)}>
+              <div className="flex items-center gap-2 mx-4 mt-4 items-bottom px-5">
+                <p className="cursor-pointer text-2xl font-bold hover:text-rose-600 text-rose-400" onClick={() => setShowCalendar(true)}>
                   {getHeaderText()}
                 </p>
                 <button
