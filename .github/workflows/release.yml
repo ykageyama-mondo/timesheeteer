@@ -41,7 +41,7 @@ jobs:
         uses: ncipollo/release-action@v1
         with:
           tag: ${{ env.VERSION }}
-          draft: true
+          draft: false
           commit: ${{ github.sha }}
           artifacts: output/*
           generateReleaseNotes: true
