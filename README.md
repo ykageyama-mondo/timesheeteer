@@ -6,7 +6,7 @@ Timesheeting sucks. Especially in Success Factors. This is a tool to make it suc
 
 1. Download the [latest release](https://github.com/ykageyama-mondo/timesheeteer/releases/latest/download/timesheeteer.zip)
 2. Unzip the file
-3. Load your extension in Chrome following:
+3. Load your extension in Chrome:
    1. Go to `chrome://extensions/`
    2. Check Developer mode
    3. Click on Load unpacked extension
@@ -17,7 +17,7 @@ Timesheeting sucks. Especially in Success Factors. This is a tool to make it suc
 1. Clone this repo
 2. Run `pnpm install`
 3. Run `pnpm start`
-3. Load your extension in Chrome following:
+3. Load your extension in Chrome:
    1. Go to `chrome://extensions/`
    2. Check Developer mode
    3. Click on Load unpacked extension
