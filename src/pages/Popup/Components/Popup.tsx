@@ -10,14 +10,18 @@ import { LoadingOverlay } from './LoadingOverlay';
 import { RecordList } from './Record';
 import { Footer } from './Footer';
 import toast, { Toaster } from 'react-hot-toast';
-import { RecordItem, ValidatedRecordItem } from '../Models';
+import { Preset, RecordItem, ValidatedRecordItem } from '../Models';
 import { TimeRecord, WorkType } from '@/models/timeRecord';
 import { FieldErrors, FormProvider, useForm } from 'react-hook-form';
-import { timeTypes, workTypes } from '../config';
+import { presetKeyPrefix, timeTypes, workTypes } from '../config';
 import { PresetPage } from './Preset';
 import { PageKey } from '../Models/pages';
-import { useAtomValue } from 'jotai';
-import { pageAtom } from '../Atoms';
+import { useAtom, useSetAtom } from 'jotai';
+import { pageAtom, presetAtom } from '../Atoms';
+import { v4 as generateUuid } from 'uuid';
+import {Dialog} from '@/components/Dialog'
+import {PresetDialog} from './PresetDialog'
+
 const today = new Date();
 
 const defaultWorkTypeMap: Record<string, WorkType> = {
@@ -65,15 +69,18 @@ const Popup = () => {
   const [dates, setDates] = useState<Date[]>([today]);
   const [showCalendar, setShowCalendar] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [showDialog, setShowDialog] = useState(false);
 
-  const currentPage = useAtomValue(pageAtom);
+  const setPresets = useSetAtom(presetAtom)
+
+  const [currentPage, setCurrentPage] = useAtom(pageAtom);
   const methods = useForm<FormData>({
     defaultValues: localStorage.getItem('formData')
       ? JSON.parse(localStorage.getItem('formData')!)
       : { records: [] },
     resetOptions: {},
   });
-  const { handleSubmit, reset, watch } = methods;
+  const { handleSubmit, reset, watch, getValues } = methods;
 
   // cache records in local storage
   useEffect(() => {
@@ -162,6 +169,33 @@ const Popup = () => {
     }
   };
 
+  const onApplyPreset = (preset: Preset) => {
+    const { records } = preset;
+    reset({ records }, { keepDefaultValues: false });
+    setCurrentPage('home')
+    toast.success(`Applied preset ${preset.name}`);
+  }
+
+  const onCreatePreset = () => {
+    setShowDialog(true)
+  }
+
+  const createPreset = (name: string) => {
+    const preset: Preset = {
+      name,
+      records: getValues().records as Preset['records']
+    }
+
+    const key = `${presetKeyPrefix}${generateUuid()}`;
+    setPresets((pre) => ({
+      ...pre,
+      [key]: preset
+    }))
+    localStorage.setItem(key, JSON.stringify(preset));
+    setCurrentPage('presets')
+    toast.success(`Created preset ${name}`);
+  }
+
   const preventEnterKeySubmission = (e: React.KeyboardEvent) => {
     const target = e.target as HTMLInputElement | HTMLTextAreaElement;
     if (
@@ -176,7 +210,7 @@ const Popup = () => {
   const getPage = () => {
     switch (currentPage) {
       case 'presets':
-        return <PresetPage />;
+        return <PresetPage onApply={onApplyPreset}/>;
       case 'settings':
         return <div>Settings</div>;
       case 'home':
@@ -209,7 +243,7 @@ const Popup = () => {
                   clear
                 </button>
               </div>
-              <RecordList />
+              <RecordList onCreatePreset={onCreatePreset}/>
               <Footer />
             </form>
           </FormProvider>
@@ -234,6 +268,7 @@ const Popup = () => {
         toastOptions={{ duration: 3000 }}
       />
       {getPage()}
+      <PresetDialog showDialog={showDialog} setShowDialog={setShowDialog} onSubmit={createPreset}/>
     </div>
   );
 };

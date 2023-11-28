@@ -3,7 +3,7 @@ import { ChangeEvent, useEffect } from 'react';
 import { FaFillDrip, FaPlus, FaTrash } from 'react-icons/fa';
 import { useFieldArray, useFormContext } from 'react-hook-form';
 import { expandTimeTypes, timeOptions, workOptions } from '../config';
-import {FiPlus} from 'react-icons/fi'
+import { FiPlus, FiSave } from 'react-icons/fi';
 
 interface TimePickerProps {
   name: string;
@@ -140,7 +140,6 @@ const Record = ({
             placeHolder="CAPEX"
             name={`records.${index}.workType` as const}
           />{' '}
-
         </div>
       )}
     </div>
@@ -148,10 +147,16 @@ const Record = ({
 };
 
 const lenMessage = `I think you forgot something. Not sure what... Might be your ENTIRE TIMESHEET 😠`;
-export const RecordList = () => {
-
+interface RecordListProps {
+  onCreatePreset: () => void;
+}
+export const RecordList: React.FC<RecordListProps> = ({ onCreatePreset }) => {
   const { control } = useFormContext();
-  const { append: appendRecord, fields: records, remove: removeRecord } = useFieldArray({
+  const {
+    append: appendRecord,
+    fields: records,
+    remove: removeRecord,
+  } = useFieldArray({
     control,
     name: 'records',
     rules: {
@@ -175,25 +180,39 @@ export const RecordList = () => {
 
   return (
     <div className="flex flex-col gap-2 h-[450px] overflow-y-auto overflow-x-hidden p-2 scrollbar-thin scrollbar-thumb-rose-300 scrollbar-track-transparent">
-      {records.length ? records.map((field, i) => (
-        <div
-          key={field.id}
-          className="p-4 text-base bg-stone-400/10 rounded-2xl"
-        >
-          <Record index={i} onRemove={() => handleRemoveRecord(i)} />
+      {records.length ? (
+        records.map((field, i) => (
+          <div
+            key={field.id}
+            className="p-4 text-base bg-stone-400/10 rounded-2xl"
+          >
+            <Record index={i} onRemove={() => handleRemoveRecord(i)} />
+          </div>
+        ))
+      ) : (
+        <div className="p-4 text-base bg-stone-400/10 rounded-2xl">
+          No records.
         </div>
-      )) : <div
-      className="p-4 text-base bg-stone-400/10 rounded-2xl"
+      )}
+      <div className="flex ml-auto gap-1">
+        <button
+          type="button"
+          onClick={onCreatePreset}
+          className="flex justify-center items-center w-fit gap-1 px-4 py-2 text-rose-500 hover:text-rose-700 transition-all duration-300 rounded-full bg-rose-100 hover:bg-rose-200"
+        >
+          <FiSave className="w-5 h-5" />
+          <span>create preset</span>
+        </button>
+        <button
+          type="button"
+          onClick={handleAddRecord}
+          className="flex justify-center items-center w-fit gap-1 px-4 py-2 text-rose-500 hover:text-rose-700 transition-all duration-300 rounded-full bg-rose-100 hover:bg-rose-200"
+        >
+          <FiPlus className="w-5 h-5" />
+          <span>add a record</span>
+        </button>
+      </div>
 
-      >No records.</div>}
-      <button
-        type="button"
-        onClick={handleAddRecord}
-        className="ml-auto flex justify-center items-center w-fit gap-1 px-4 py-2 text-rose-500 hover:text-rose-700 transition-all duration-300 rounded-full bg-rose-100 hover:bg-rose-200"
-      >
-        <FiPlus className="w-5 h-5"/>
-        <span>add a record</span>
-      </button>
       <button
         type="submit"
         tabIndex={-1}
@@ -204,7 +223,6 @@ export const RecordList = () => {
           Fill out Timesheet
         </span>
       </button>
-
     </div>
   );
 };
